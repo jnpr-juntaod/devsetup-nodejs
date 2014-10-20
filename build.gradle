@@ -1,0 +1,71 @@
+description = "Junos Space Root Project"
+apply plugin: "idea"
+version = "0.1.0"
+
+task wrapper(type: Wrapper) {
+    gradleVersion = "2.0"
+}
+
+task "setupDevEnv" << {
+    println "Setting up development environment"
+    def process = new ProcessBuilder(["sh", "-c", "./devsetup.sh"]).directory(new File(System.getProperty("user.dir"))).redirectErrorStream(true).start()
+process.inputStream.eachLine {println it}
+}
+
+
+subprojects {
+    apply plugin: "scala"
+    apply plugin: "java"
+    apply plugin: "idea"
+    version = "0.1.0"
+    repositories {
+        mavenCentral()
+        mavenLocal()
+    }
+
+    sourceSets {
+        main {
+            java {
+                srcDir 'src/main/java'
+                srcDir 'src/main/java-generated'
+            }
+            scala {
+                srcDir 'src/main/scala'
+                srcDir 'src/main/scala-generated'
+            }
+            resources {
+                srcDir 'src/main/resources'
+            }
+
+        }
+    }
+
+    task "createDirs" << {
+        sourceSets*.scala.srcDirs*.each { it.mkdirs() }
+        sourceSets*.java.srcDirs*.each { it.mkdirs() }
+        sourceSets*.resources.srcDirs*.each { it.mkdirs() }
+    }
+
+    task "yanggeneror" << {
+        print("Done!")
+    }
+
+    dependencies{
+        compile 'org.slf4j:slf4j-api:1.7.5'
+        compile "org.scala-lang:scala-library:2.10.4"
+        compile "org.scala-lang:scala-compiler:2.10.4"
+        compile "org.scala-lang:scala-reflect:2.10.4"
+        compile "io.spray:spray-routing:1.3.1"
+        compile "io.spray:spray-can:1.3.1"
+        compile "io.spray:spray-caching:1.3.1"
+        compile "com.typesafe.akka:akka-actor_2.10:2.3.5"
+        runtime "com.typesafe.akka:akka-osgi_2.10:2.3.5"
+        compile "com.typesafe.play:anorm_2.10:2.4.0-M1"
+        compile "com.typesafe.play:play-jdbc_2.10:2.4.0-M1"
+        compile "com.typesafe.play:play-json_2.10:2.4.0-M1"
+        compile "mysql:mysql-connector-java:5.1.32"
+        compile "org.java-websocket:Java-WebSocket:1.3.0"
+        testCompile "junit:junit:4.11"
+    }
+
+}
